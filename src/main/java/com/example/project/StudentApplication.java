@@ -12,9 +12,6 @@ public class StudentApplication {
 
 		SpringApplication.run(StudentApplication.class, args);
 
-		Student student = new Student(123, "firstName", "lastName");
-		StudentController studentController = new StudentController();
- 		studentController.createStudent(student);
 	}
 
 }
