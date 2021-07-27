@@ -7,43 +7,46 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @Controller
+@RequestMapping(value = "student")
 public class StudentController {
 
     @Autowired
     StudentRepository repo;
 
 
-
-
-    @PostMapping(value = "/createStudent", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createStudent (@RequestBody Student student)
     {
+        String studentFirstName = student.getFirstName();
+        String studentLastName = student.getLastName();
+
+        if(studentFirstName == null || studentLastName == null ||
+                studentFirstName.equals("") || studentLastName.equals(""))
+        {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Both 'first name' and 'last name' are required");
+        }
+
         repo.save(student);
         return ResponseEntity.ok("Student ID: " + student.getId() + " added successfully");
-
-
     }
 
-    @GetMapping(value = "/getStudent/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getStudent(@PathVariable("id") int id)
     {
         Optional<Student> student = repo.findById(id);
-            if(student.get() != null)
-                return ResponseEntity.ok(student.toString());
+            if(!student.isEmpty())
+                return ResponseEntity.ok(student.get().toString());
             else
-                return (ResponseEntity<String>) ResponseEntity.noContent();
-
-
-
-
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("User with ID: " + id + " does not exist in the Database");
     }
 }
