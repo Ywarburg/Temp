@@ -50,6 +50,6 @@ public class StudentController {
                     .body("e.getMessage()");
         }
 
-        return ResponseEntity.ok("Student ID: " + student.toString());
+        return ResponseEntity.ok(student.toString());
     }
 }
